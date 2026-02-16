@@ -1,0 +1,143 @@
+---
+title: "Voting round 2"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_download: true
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(message=FALSE,
+                      warning=FALSE)
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+library(vote)
+library(writexl)
+
+```
+
+# Wrangle data
+
+NB the original data has to be manually wrangled a little to create a combined first row that has the scale and item. find and replace the quesion text, then create an excel formula to paste together the heading and item.
+
+```{r}
+
+dat_all <- read_csv("../data/round 2 - delphi/Delphi round2 cleaned manual.csv") |>
+  janitor::clean_names()|>
+  rename_with(~ str_replace_all(.x, "_\\d+", "_")) 
+
+dat_design_and_exp <- dat_all |>
+  select(starts_with("design_and_exp_"))|>
+  select(!ends_with("optional")) |>
+  rename_with(~ str_remove_all(.x, "design_and_exp_"))
+
+dat_respsonse_and_gov <- dat_all |>
+  select(starts_with("respsonse_and_gov_"))|>
+  select(!ends_with("optional")) |>
+  rename_with(~ str_remove_all(.x, "respsonse_and_gov_"))
+
+dat_research_and_data <- dat_all |>
+  select(starts_with("research_and_data_"))|>
+  select(!ends_with("optional")) |>
+  rename_with(~ str_remove_all(.x, "research_and_data_"))
+
+
+dat_comments <- dat_all |>
+  select(ends_with("optional")) |>
+  pivot_longer(cols = everything(), 
+               names_to = "section", 
+               values_to = "comment") |>
+  arrange(section) |>
+  drop_na()
+
+#write_xlsx(dat_comments, "data_processed_comments.xlsx")
+
+```
+
+# Run Single Transferrable Vote 
+
+proportional ranked-choice, multi-winner 
+
+## design and exp
+
+```{r}
+
+res_design_and_exp <- stv(
+  votes           = dat_design_and_exp,
+  nseats          = 5,
+  invalid.partial = TRUE,   # allow partial ballots
+  equal.ranking   = FALSE,  # no ties within a ballot
+  quota.hare      = FALSE,  # Droop quota (set TRUE for Hare)
+  verbose         = FALSE,
+  quiet           = TRUE
+)
+
+# winners
+res_design_and_exp$elected
+
+# # other stuff
+# summary(res_design_and_exp)
+# plot(res_design_and_exp)
+# image(res_design_and_exp, legend=TRUE)
+
+```
+
+## respsonse and gov
+
+```{r}
+
+res_respsonse_and_gov <- stv(
+  votes           = dat_respsonse_and_gov,
+  nseats          = 5,
+  invalid.partial = TRUE,   # allow partial ballots
+  equal.ranking   = FALSE,  # no ties within a ballot
+  quota.hare      = FALSE,  # Droop quota (set TRUE for Hare)
+  verbose         = FALSE,
+  quiet           = TRUE
+)
+
+# winners
+res_respsonse_and_gov$elected
+
+# # other stuff
+# summary(res_respsonse_and_gov)
+# plot(res_respsonse_and_gov)
+# image(res_respsonse_and_gov, legend=TRUE)
+
+```
+
+## research and data
+
+```{r}
+
+res_research_and_data <- stv(
+  votes           = dat_research_and_data,
+  nseats          = 5,
+  invalid.partial = TRUE,   # allow partial ballots
+  equal.ranking   = FALSE,  # no ties within a ballot
+  quota.hare      = FALSE,  # Droop quota (set TRUE for Hare)
+  verbose         = FALSE,
+  quiet           = TRUE
+)
+
+# winners
+res_research_and_data$elected
+
+# # other stuff
+# summary(res_research_and_data)
+# plot(res_research_and_data)
+# image(res_research_and_data, legend=TRUE)
+
+```
+
+

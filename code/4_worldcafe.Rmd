@@ -1,0 +1,259 @@
+---
+title: "Worldcafe - Progress Ratings Across Sectors"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_download: true
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(message=FALSE,
+                      warning=FALSE)
+```
+
+# Dependencies
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(plotrix)
+library(ggstance)
+
+```
+
+# Load data and cleaning
+
+```{r}
+
+df <- read_csv("../data/round 3 - world cafe/worldcafe raw.csv") %>%
+  clean_names() %>%
+  select(respondent_id, group, priority, sector_raw, rating)
+
+# Priority labels (from numeric code)
+priority_labels <- c(
+  "1" = "Self Regulation & Co-Regulation",
+  "2" = "Long-Term Effects",
+  "3" = "Harms & Benefits",
+  "4" = "Data Sharing",
+  "5" = "Child Safety & Protection"
+)
+
+df <- df %>%
+  mutate(priority_label = priority_labels[as.character(priority)])
+
+# Domains
+priority_domains <- c(
+  "Self Regulation & Co-Regulation" = "Responsibility & Governance",
+  "Long-Term Effects"               = "Game Design & Player Experience",
+  "Harms & Benefits"                = "Game Design & Player Experience",
+  "Data Sharing"                    = "Research & Data",
+  "Child Safety & Protection"       = "Responsibility & Governance"
+)
+
+df <- df %>%
+  mutate(domain = priority_domains[priority_label])
+
+# Split multi-sector entries
+df <- df %>%
+  mutate(sector_raw = str_split(sector_raw, ";")) %>%
+  unnest(sector_raw) %>%
+  mutate(sector_raw = str_squish(sector_raw))
+
+# -----------------------------
+# 2. Convert rating to numeric
+# -----------------------------
+rating_scale <- c(
+  "Not Yet Started" = 1,
+  "Emerging"        = 2,
+  "Early Progress"  = 3,
+  "Established"     = 4,
+  "Fully Achieved"  = 5
+)
+
+df <- df %>%
+  mutate(rating_num = rating_scale[rating])
+
+# -----------------------------
+# 3. Summaries
+# -----------------------------
+df_summary <- df %>%
+  group_by(domain, priority_label, sector_raw) %>%
+  summarise(
+    n = n(),
+    mean_rating = mean(rating_num, na.rm = TRUE),
+    se_rating = plotrix::std.error(rating_num, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(priority_label = case_when(
+    priority_label == "Harms & Benefits" ~ "Harms\n& Benefits",
+    priority_label == "Long-Term Effects" ~ "Long-Term\nEffects",
+    priority_label == "Data Sharing" ~ "Data Sharing",
+    priority_label == "Child Safety & Protection" ~ "Child Safety\n& Protection",
+    priority_label == "Self Regulation & Co-Regulation" ~ "Self Regulation\n& Co-Regulation"
+  )) 
+
+#distinct(label_df, domain)
+
+# -----------------------------
+# 4. Force desired top-to-bottom order
+# -----------------------------
+# priority_order <- c(
+#   "Harms & Benefits",
+#   "Long-Term Effects",
+#   "Data Sharing",
+#   "Child Safety & Protection",
+#   "Self Regulation & Co-Regulation"
+# )
+
+priority_order <- c(
+  "Harms\n& Benefits",
+  "Long-Term\nEffects",
+  "Data Sharing",
+  "Child Safety\n& Protection",
+  "Self Regulation\n& Co-Regulation"
+)
+
+sector_order <- c(
+  "Academic",			
+  "Civil Society",				
+  "Industry",
+  "Other"
+)
+
+df_summary <- df_summary %>%
+  mutate(
+    priority_label = forcats::fct_rev(factor(priority_label, levels = priority_order)),
+    #priority_label = factor(priority_label, levels = priority_order)
+    sector_raw = forcats::fct_rev(factor(sector_raw, levels = sector_order))
+  )
+
+# Data frame for left-side text labels
+label_df <- df_summary %>%
+  distinct(priority_label, domain) |>
+  mutate(domain = case_when(
+    domain == "Game Design & Player Experience" ~ "Game Design\n& Player Experience",
+    domain == "Research & Data" ~ "Research\n& Data",
+    domain == "Responsibility & Governance" ~ "Responsibility\n& Governance"
+  ))
+
+# -----------------------------
+# 5. Colours
+# -----------------------------
+sector_cols <- c(
+  "Academic"      = "#8FA7CC",
+  "Civil Society" = "#386DA6",
+  "Industry"      = "#7B4F97",
+  #"Government"    = "#52376B",
+  "Other"         = "#12204D"
+)
+
+```
+
+# Plot
+
+```{r fig.height=6, fig.width=12}
+
+p <- ggplot(df_summary, aes(x = mean_rating, y = priority_label)) +
+
+  # Dots for sector means
+  ggstance::geom_linerangeh(aes(color = sector_raw,
+                                xmin = mean_rating - se_rating*1.96, 
+                                xmax = mean_rating + se_rating*1.96),
+                            position = position_dodge(width = 0.5)) +
+  geom_point(aes(color = sector_raw), 
+             size = 4, position = position_dodge(width = 0.5)) +
+  scale_color_manual(values = sector_cols,
+                     guide = guide_legend(reverse = TRUE)) +
+
+  scale_x_continuous(
+    breaks = 1:5,
+    labels = c("Not Yet\nStarted", "Emerging",
+               "Early\nProgress", "Established",
+               "Fully\nAchieved")
+  ) +
+
+  labs(
+    y = NULL,
+    x = NULL,
+    color = "Sector",
+    title = "Current progress ratings across priorities by sectors",
+    subtitle = "Dots show sector means ± 95% CI"
+  ) +
+
+  theme_minimal(base_size = 16) +
+  theme(
+    # remove default y-axis labels (we draw our own)
+    axis.text.y  = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+
+    axis.text.x = element_text(size = 12),
+    plot.title  = element_text(face = "bold", size = 18),
+
+    legend.title = element_text(size = 14),
+    legend.text  = element_text(size = 12),
+    legend.position = "right",
+
+    # white background
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background  = element_rect(fill = "white", color = NA),
+
+    # extra left margin for text columns
+    plot.margin = margin(20, 20, 20, 20)
+  ) +
+  coord_cartesian(clip = "off",
+                  xlim = c(-3.75, 5.5)) +
+  # # Domain labels (left column)
+  # geom_text(data = label_df,
+  #           aes(x = -2.5, y = priority_label, label = domain),
+  #           hjust = 0,
+  #           #fontface = "bold",
+  #           size = 5) +
+  # # Priority labels (second column)
+  # geom_text(data = label_df,
+  #           aes(x = -5.5, y = priority_label, label = priority_label),
+  #           hjust = 0,
+  #           #fontface = "bold",
+  #           size = 5)
+  # Domain labels (left column)
+  geom_text(data = label_df,
+            aes(x = -1.5, y = priority_label, label = domain),
+            hjust = 1,
+            #fontface = "bold",
+            size = 5) +
+  # Priority labels (second column)
+  geom_text(data = label_df,
+            aes(x = 0.25, y = priority_label, label = priority_label),
+            hjust = 1,
+            #fontface = "bold",
+            size = 5)
+
+p
+
+# -----------------------------
+# 7. Save with good proportions
+# -----------------------------
+ggsave(
+  filename = "../data/outputs/worldcafe_progress_ratings.pdf",
+  plot = p,
+  width = 13,
+  height = 6
+)
+
+ggsave(
+  filename = "../data/outputs/worldcafe_progress_ratings.png",
+  plot = p,
+  width = 13,
+  height = 6,
+  dpi = 600
+)
+
+```
+
+

@@ -1,0 +1,121 @@
+---
+title: "Demographics round 2"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_download: true
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(message=FALSE,
+                      warning=FALSE)
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+library(janitor)
+
+```
+
+# Load data
+
+```{r}
+# Load and clean
+round2 <- read_csv("../data/round 2 - delphi/Delphi raw2.csv") %>% 
+  clean_names() |>
+  slice(3:n())
+```
+
+# Cleaning
+
+```{r}
+demo_clean2 <- round2 %>%
+  mutate(
+    sector_clean  = ifelse(!is.na(sector) & sector != "", sector, NA_character_),
+    sector_list   = str_split(sector_clean, ";") %>% map(~trimws(.x)),
+    sector_other  = sector_6_text
+  ) %>%
+  select(
+    response_id,
+    sector_list,
+    sector_other,
+  )
+```
+
+# Descriptives
+
+## N
+
+```{r}
+## n 
+n_participants <- nrow(demo_clean2)
+n_participants
+```
+
+## sector
+
+```{r}
+## normal pie chart (no % labels)
+keep_levels <- c(
+  "Academic researcher",
+  "Industry professional",
+  "Civil society or nonprofit representative",
+  "Policy or government advisor",
+  "Research funder or philanthropic representative",
+  "Other"
+)
+
+sector_palette <- c(
+  "Academic researcher" = "#B7A5D3",
+  "Industry professional" = "#8FA7CC",
+  "Civil society or nonprofit representative" = "#386DA6",
+  "Policy or government advisor" = "#2B537C",
+  "Research funder or philanthropic representative" = "#52376B",
+  "Other" = "#7B4F97"
+)
+
+sector_one <- demo_clean2 %>%
+  unnest(sector_list) %>%
+  filter(!is.na(sector_list), sector_list != "") %>%
+  mutate(sector = str_squish(sector_list)) %>%
+  mutate(sector = recode(
+    sector,
+    "Industry professional (e.g., developer, designer, platform representative, in-house counsel)" = "Industry professional",
+    "Other (please specify)" = "Other"
+  )) %>%
+  distinct(response_id, sector) %>%
+  filter(sector %in% keep_levels) %>%
+  mutate(sector = factor(sector, levels = keep_levels))
+
+sector_summary <- sector_one %>%
+  count(sector, sort = TRUE)
+
+sector_plot <- ggplot(sector_summary, aes(x = "", y = n, fill = sector)) +
+  geom_col(width = 1, colour = "white", linewidth = 0.7) +
+  coord_polar(theta = "y") +
+  scale_fill_manual(values = sector_palette, drop = FALSE) +
+  labs(fill = "Sector") +
+  theme_void(base_size = 14) +
+  theme(
+    legend.title = element_text(size = 14),
+    legend.text  = element_text(size = 12),
+    legend.position = "right"
+  )
+
+sector_plot
+
+ggsave("../data/outputs/round2 sector pie.png", sector_plot, width = 6, height = 4, dpi = 300)
+ggsave("../data/outputs/round2 sector pie.pdf", sector_plot, width = 6, height = 4)
+
+
+```
+
+
