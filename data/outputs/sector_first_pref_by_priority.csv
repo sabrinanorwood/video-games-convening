@@ -1,0 +1,78 @@
+sector,domain,label,n_first,n_valid,pct_first,note
+Academia,Design & experience,Dark patterns,10,26,38.5,
+Academia,Design & experience,Harms & benefits,4,26,15.4,
+Academia,Design & experience,Long-term effects,2,26,7.7,
+Academia,Design & experience,User trust & safety,2,26,7.7,
+Academia,Design & experience,Who is playing,2,26,7.7,
+Academia,Design & experience,Accessibility,1,26,3.8,
+Academia,Design & experience,Creativity & innovation,1,26,3.8,
+Academia,Design & experience,"Diversity, equity, inclusion (DEI)",1,26,3.8,
+Academia,Design & experience,Families & children,1,26,3.8,
+Academia,Design & experience,Motivations,1,26,3.8,
+Academia,Design & experience,Supportive mechanics,1,26,3.8,
+Civil society,Design & experience,Supportive mechanics,2,5,40, (small N - unstable)
+Civil society,Design & experience,Accessibility,1,5,20, (small N - unstable)
+Civil society,Design & experience,Families & children,1,5,20, (small N - unstable)
+Civil society,Design & experience,Who is playing,1,5,20, (small N - unstable)
+Industry,Design & experience,Harms & benefits,4,14,28.6,
+Industry,Design & experience,Motivations,3,14,21.4,
+Industry,Design & experience,User trust & safety,2,14,14.3,
+Industry,Design & experience,Creativity & innovation,1,14,7.1,
+Industry,Design & experience,"Diversity, equity, inclusion (DEI)",1,14,7.1,
+Industry,Design & experience,Families & children,1,14,7.1,
+Industry,Design & experience,Long-term effects,1,14,7.1,
+Industry,Design & experience,Who is playing,1,14,7.1,
+Other,Design & experience,User trust & safety,2,5,40, (small N - unstable)
+Other,Design & experience,Creativity & innovation,1,5,20, (small N - unstable)
+Other,Design & experience,Dark patterns,1,5,20, (small N - unstable)
+Other,Design & experience,Harms & benefits,1,5,20, (small N - unstable)
+Policy/gov,Design & experience,Long-term effects,2,4,50, (small N - unstable)
+Policy/gov,Design & experience,Dark patterns,1,4,25, (small N - unstable)
+Policy/gov,Design & experience,User trust & safety,1,4,25, (small N - unstable)
+Academia,Research & data,Funding & infrastructure,5,26,19.2,
+Academia,Research & data,Industry-academic data sharing,5,26,19.2,
+Academia,Research & data,Open data & transparency,5,26,19.2,
+Academia,Research & data,Qualitative & mixed-method research,4,26,15.4,
+Academia,Research & data,Theory development,3,26,11.5,
+Academia,Research & data,Interdisciplinary work,2,26,7.7,
+Academia,Research & data,Sector-wide collaboration,2,26,7.7,
+Civil society,Research & data,Industry-academic data sharing,2,5,40, (small N - unstable)
+Civil society,Research & data,Sector-wide collaboration,2,5,40, (small N - unstable)
+Civil society,Research & data,Interdisciplinary work,1,5,20, (small N - unstable)
+Industry,Research & data,Industry-academic data sharing,6,14,42.9,
+Industry,Research & data,Interdisciplinary work,2,14,14.3,
+Industry,Research & data,Open data & transparency,2,14,14.3,
+Industry,Research & data,Sector-wide collaboration,2,14,14.3,
+Industry,Research & data,Funding & infrastructure,1,14,7.1,
+Industry,Research & data,Theory development,1,14,7.1,
+Other,Research & data,Sector-wide collaboration,2,4,50, (small N - unstable)
+Other,Research & data,Funding & infrastructure,1,4,25, (small N - unstable)
+Other,Research & data,Industry-academic data sharing,1,4,25, (small N - unstable)
+Policy/gov,Research & data,Industry-academic data sharing,2,3,66.7, (small N - unstable)
+Policy/gov,Research & data,Theory development,1,3,33.3, (small N - unstable)
+Academia,Response & governance,Regulation & enforcement,6,26,23.1,
+Academia,Response & governance,Dark patterns (regulatory perspective),5,26,19.2,
+Academia,Response & governance,Data sharing & transparency,4,26,15.4,
+Academia,Response & governance,Sector-wide collaboration,3,26,11.5,
+Academia,Response & governance,Child safety & protection,2,26,7.7,
+Academia,Response & governance,Corporate social responsibility & labour practices,2,26,7.7,
+Academia,Response & governance,Player perspectives in governance,2,26,7.7,
+Academia,Response & governance,Monopolisation and platform power,1,26,3.8,
+Academia,Response & governance,Self-regulation & co-regulation,1,26,3.8,
+Civil society,Response & governance,Child safety & protection,3,5,60, (small N - unstable)
+Civil society,Response & governance,Artificial intelligence (AI),1,5,20, (small N - unstable)
+Civil society,Response & governance,Self-regulation & co-regulation,1,5,20, (small N - unstable)
+Industry,Response & governance,Self-regulation & co-regulation,5,14,35.7,
+Industry,Response & governance,Child safety & protection,3,14,21.4,
+Industry,Response & governance,Monopolisation and platform power,2,14,14.3,
+Industry,Response & governance,Artificial intelligence (AI),1,14,7.1,
+Industry,Response & governance,Data sharing & transparency,1,14,7.1,
+Industry,Response & governance,Regulation & enforcement,1,14,7.1,
+Industry,Response & governance,Sector-wide collaboration,1,14,7.1,
+Other,Response & governance,Self-regulation & co-regulation,2,5,40, (small N - unstable)
+Other,Response & governance,Child safety & protection,1,5,20, (small N - unstable)
+Other,Response & governance,Player perspectives in governance,1,5,20, (small N - unstable)
+Other,Response & governance,Regulation & enforcement,1,5,20, (small N - unstable)
+Policy/gov,Response & governance,Artificial intelligence (AI),1,3,33.3, (small N - unstable)
+Policy/gov,Response & governance,Dark patterns (regulatory perspective),1,3,33.3, (small N - unstable)
+Policy/gov,Response & governance,Self-regulation & co-regulation,1,3,33.3, (small N - unstable)

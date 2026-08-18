@@ -1,0 +1,151 @@
+sector,domain,label,n_ranked,mean_rank,median_rank
+Academia,Design & experience,Accessibility,26,7.42,7
+Academia,Design & experience,Cheating,26,10.08,11
+Academia,Design & experience,Creativity & innovation,26,7.35,7
+Academia,Design & experience,Dark patterns,26,3.65,2
+Academia,Design & experience,"Diversity, equity, inclusion (DEI)",26,8.23,8.5
+Academia,Design & experience,Families & children,26,8.08,9
+Academia,Design & experience,Harms & benefits,26,5.19,4
+Academia,Design & experience,Long-term effects,26,6.54,6
+Academia,Design & experience,Motivations,26,7.58,8.5
+Academia,Design & experience,Social connection & community,26,7.12,8
+Academia,Design & experience,Supportive mechanics,26,7.27,7
+Academia,Design & experience,User trust & safety,26,5.19,5
+Academia,Design & experience,Who is playing,26,7.31,7
+Academia,Research & data,Funding & infrastructure,26,3.58,3
+Academia,Research & data,Industry-academic data sharing,26,2.88,2
+Academia,Research & data,Interdisciplinary work,26,3.85,4
+Academia,Research & data,Open data & transparency,26,3.96,4
+Academia,Research & data,Qualitative & mixed-method research,26,4.5,5
+Academia,Research & data,Sector-wide collaboration,26,4.73,5
+Academia,Research & data,Theory development,26,4.5,5
+Academia,Response & governance,Artificial intelligence (AI),26,7.12,7.5
+Academia,Response & governance,Child safety & protection,26,4.88,5
+Academia,Response & governance,Corporate social responsibility & labour practices,26,6.19,6.5
+Academia,Response & governance,Dark patterns (regulatory perspective),26,4.15,3
+Academia,Response & governance,Data sharing & transparency,26,4.77,4.5
+Academia,Response & governance,Monopolisation and platform power,26,5.65,6
+Academia,Response & governance,Player perspectives in governance,26,5.65,7
+Academia,Response & governance,Regulation & enforcement,26,4.65,5
+Academia,Response & governance,Sector-wide collaboration,26,5.62,5
+Academia,Response & governance,Self-regulation & co-regulation,26,6.31,6
+Civil society,Design & experience,Accessibility,5,7.2,9
+Civil society,Design & experience,Cheating,5,11.4,12
+Civil society,Design & experience,Creativity & innovation,5,10.4,10
+Civil society,Design & experience,Dark patterns,5,6.4,6
+Civil society,Design & experience,"Diversity, equity, inclusion (DEI)",5,8.6,8
+Civil society,Design & experience,Families & children,5,4.6,5
+Civil society,Design & experience,Harms & benefits,5,3.6,3
+Civil society,Design & experience,Long-term effects,5,5.4,5
+Civil society,Design & experience,Motivations,5,11.2,12
+Civil society,Design & experience,Social connection & community,5,4.6,4
+Civil society,Design & experience,Supportive mechanics,5,6.8,10
+Civil society,Design & experience,User trust & safety,5,4.2,4
+Civil society,Design & experience,Who is playing,5,6.6,7
+Civil society,Research & data,Funding & infrastructure,5,4,2
+Civil society,Research & data,Industry-academic data sharing,5,3,3
+Civil society,Research & data,Interdisciplinary work,5,4.2,4
+Civil society,Research & data,Open data & transparency,5,4.8,5
+Civil society,Research & data,Qualitative & mixed-method research,5,4.6,5
+Civil society,Research & data,Sector-wide collaboration,5,2.4,2
+Civil society,Research & data,Theory development,5,5,5
+Civil society,Response & governance,Artificial intelligence (AI),5,5.8,7
+Civil society,Response & governance,Child safety & protection,5,1.8,1
+Civil society,Response & governance,Corporate social responsibility & labour practices,5,7.6,8
+Civil society,Response & governance,Dark patterns (regulatory perspective),5,5,5
+Civil society,Response & governance,Data sharing & transparency,5,7,7
+Civil society,Response & governance,Monopolisation and platform power,5,6.2,6
+Civil society,Response & governance,Player perspectives in governance,5,8.2,9
+Civil society,Response & governance,Regulation & enforcement,5,5,5
+Civil society,Response & governance,Sector-wide collaboration,5,4.4,4
+Civil society,Response & governance,Self-regulation & co-regulation,5,4,3
+Industry,Design & experience,Accessibility,14,7.21,8
+Industry,Design & experience,Cheating,14,9.79,12
+Industry,Design & experience,Creativity & innovation,14,6.5,6.5
+Industry,Design & experience,Dark patterns,14,8.21,8.5
+Industry,Design & experience,"Diversity, equity, inclusion (DEI)",14,8.07,8
+Industry,Design & experience,Families & children,14,7,7
+Industry,Design & experience,Harms & benefits,14,4.93,5
+Industry,Design & experience,Long-term effects,14,5.57,4.5
+Industry,Design & experience,Motivations,14,7,7
+Industry,Design & experience,Social connection & community,14,5.21,4.5
+Industry,Design & experience,Supportive mechanics,14,7.57,8
+Industry,Design & experience,User trust & safety,14,6,5.5
+Industry,Design & experience,Who is playing,14,7.93,7.5
+Industry,Research & data,Funding & infrastructure,14,4.14,3.5
+Industry,Research & data,Industry-academic data sharing,14,2.86,3
+Industry,Research & data,Interdisciplinary work,14,3.93,3.5
+Industry,Research & data,Open data & transparency,14,4,3.5
+Industry,Research & data,Qualitative & mixed-method research,14,5.07,5
+Industry,Research & data,Sector-wide collaboration,14,3.57,3.5
+Industry,Research & data,Theory development,14,4.43,5
+Industry,Response & governance,Artificial intelligence (AI),14,6.36,7.5
+Industry,Response & governance,Child safety & protection,14,5.5,5
+Industry,Response & governance,Corporate social responsibility & labour practices,14,6.21,6
+Industry,Response & governance,Dark patterns (regulatory perspective),14,7.07,8
+Industry,Response & governance,Data sharing & transparency,14,4.71,5
+Industry,Response & governance,Monopolisation and platform power,14,5.21,5
+Industry,Response & governance,Player perspectives in governance,14,6.29,6.5
+Industry,Response & governance,Regulation & enforcement,14,5.86,6
+Industry,Response & governance,Sector-wide collaboration,14,3.71,3
+Industry,Response & governance,Self-regulation & co-regulation,14,4.07,4
+Other,Design & experience,Accessibility,5,8.6,9
+Other,Design & experience,Cheating,5,11,10
+Other,Design & experience,Creativity & innovation,5,8.2,10
+Other,Design & experience,Dark patterns,5,4,2
+Other,Design & experience,"Diversity, equity, inclusion (DEI)",5,8.4,9
+Other,Design & experience,Families & children,5,6.4,6
+Other,Design & experience,Harms & benefits,5,6.4,8
+Other,Design & experience,Long-term effects,5,9.6,11
+Other,Design & experience,Motivations,5,6.4,7
+Other,Design & experience,Social connection & community,5,7.4,8
+Other,Design & experience,Supportive mechanics,5,6.2,7
+Other,Design & experience,User trust & safety,5,2.2,2
+Other,Design & experience,Who is playing,5,6.2,5
+Other,Research & data,Funding & infrastructure,4,3.25,3
+Other,Research & data,Industry-academic data sharing,4,2.25,2.5
+Other,Research & data,Interdisciplinary work,4,4.5,4.5
+Other,Research & data,Open data & transparency,4,3,2.5
+Other,Research & data,Qualitative & mixed-method research,4,5.75,6
+Other,Research & data,Sector-wide collaboration,4,2.75,2.5
+Other,Research & data,Theory development,4,6.5,7
+Other,Response & governance,Artificial intelligence (AI),5,7.4,7
+Other,Response & governance,Child safety & protection,5,3.8,4
+Other,Response & governance,Corporate social responsibility & labour practices,5,6,7
+Other,Response & governance,Dark patterns (regulatory perspective),5,5,5
+Other,Response & governance,Data sharing & transparency,5,4.6,4
+Other,Response & governance,Monopolisation and platform power,5,8.4,10
+Other,Response & governance,Player perspectives in governance,5,4.8,5
+Other,Response & governance,Regulation & enforcement,5,4,4
+Other,Response & governance,Sector-wide collaboration,5,5.6,6
+Other,Response & governance,Self-regulation & co-regulation,5,5.4,6
+Policy/gov,Design & experience,Accessibility,4,6,6
+Policy/gov,Design & experience,Cheating,4,8.75,9.5
+Policy/gov,Design & experience,Creativity & innovation,4,9.25,9.5
+Policy/gov,Design & experience,Dark patterns,4,6.25,6.5
+Policy/gov,Design & experience,"Diversity, equity, inclusion (DEI)",4,7.75,9
+Policy/gov,Design & experience,Families & children,4,8.75,8
+Policy/gov,Design & experience,Harms & benefits,4,7,5.5
+Policy/gov,Design & experience,Long-term effects,4,4.5,2
+Policy/gov,Design & experience,Motivations,4,8.25,8
+Policy/gov,Design & experience,Social connection & community,4,6.75,8
+Policy/gov,Design & experience,Supportive mechanics,4,8.25,8.5
+Policy/gov,Design & experience,User trust & safety,4,5,4.5
+Policy/gov,Design & experience,Who is playing,4,4.5,2
+Policy/gov,Research & data,Funding & infrastructure,3,5.67,7
+Policy/gov,Research & data,Industry-academic data sharing,3,2,1
+Policy/gov,Research & data,Interdisciplinary work,3,4,4
+Policy/gov,Research & data,Open data & transparency,3,3.67,4
+Policy/gov,Research & data,Qualitative & mixed-method research,3,4.33,5
+Policy/gov,Research & data,Sector-wide collaboration,3,6.33,6
+Policy/gov,Research & data,Theory development,3,2,2
+Policy/gov,Response & governance,Artificial intelligence (AI),3,4.33,5
+Policy/gov,Response & governance,Child safety & protection,3,3.33,3
+Policy/gov,Response & governance,Corporate social responsibility & labour practices,3,8.33,9
+Policy/gov,Response & governance,Dark patterns (regulatory perspective),3,4.67,3
+Policy/gov,Response & governance,Data sharing & transparency,3,2.67,2
+Policy/gov,Response & governance,Monopolisation and platform power,3,5.67,6
+Policy/gov,Response & governance,Player perspectives in governance,3,7,8
+Policy/gov,Response & governance,Regulation & enforcement,3,4.33,4
+Policy/gov,Response & governance,Sector-wide collaboration,3,8.33,9
+Policy/gov,Response & governance,Self-regulation & co-regulation,3,6.33,8
