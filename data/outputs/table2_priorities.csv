@@ -1,0 +1,31 @@
+domain,priority,stv_order,ballots_ranked,first_pref,world_cafe
+Game design & player experience,Dark patterns,1,53,11,FALSE
+Game design & player experience,Harms & benefits,2,53,9,TRUE
+Game design & player experience,Long-term effects,3,53,5,TRUE
+Game design & player experience,User trust & safety,4,53,7,FALSE
+Game design & player experience,Who is playing,5,53,4,FALSE
+Game design & player experience,Motivations,NA,53,4,FALSE
+Game design & player experience,Supportive mechanics,NA,53,3,FALSE
+Game design & player experience,Families & children,NA,53,3,FALSE
+Game design & player experience,Creativity & innovation,NA,53,3,FALSE
+Game design & player experience,"Diversity, equity, inclusion (DEI)",NA,53,2,FALSE
+Game design & player experience,Accessibility,NA,53,2,FALSE
+Game design & player experience,Cheating,NA,53,0,FALSE
+Game design & player experience,Social connection & community,NA,53,0,FALSE
+Research & data,Industry-academic data sharing,1,51,16,TRUE
+Research & data,Open data & transparency,2,51,7,TRUE
+Research & data,Funding & infrastructure,3,51,7,FALSE
+Research & data,Interdisciplinary work,4,51,5,FALSE
+Research & data,Sector-wide collaboration,5,51,7,FALSE
+Research & data,Theory development,NA,51,5,FALSE
+Research & data,Qualitative & mixed-method research,NA,51,4,FALSE
+Responsibility & governance,Self-regulation & co-regulation,1,52,10,TRUE
+Responsibility & governance,Child safety & protection,2,52,9,TRUE
+Responsibility & governance,Regulation & enforcement,3,52,7,FALSE
+Responsibility & governance,Dark patterns (regulatory perspective),4,52,6,FALSE
+Responsibility & governance,Monopolisation and platform power,5,52,3,FALSE
+Responsibility & governance,Data sharing & transparency,NA,52,5,FALSE
+Responsibility & governance,Sector-wide collaboration,NA,52,4,FALSE
+Responsibility & governance,Player perspectives in governance,NA,52,3,FALSE
+Responsibility & governance,Artificial intelligence (AI),NA,52,3,FALSE
+Responsibility & governance,Corporate social responsibility & labour practices,NA,52,2,FALSE

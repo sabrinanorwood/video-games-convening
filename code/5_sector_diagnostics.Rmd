@@ -1,0 +1,368 @@
+---
+title: "Round 2 sector diagnostics (exploratory / descriptive)"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_download: true
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+# Purpose and scope
+
+A reviewer asked whether different priorities were driven more by different
+**sectors**, particularly **academia vs industry**. This file is an **exploratory,
+descriptive diagnostic** written to establish what the data can *legitimately*
+support before deciding whether to report anything.
+
+It is deliberately kept **separate** from the primary analyses:
+
+* it does **not** modify the pre-registered/primary STV analysis in
+  `3_delphi_voting.Rmd`;
+* it runs **no** inferential tests (no chi-square, p-values, or confidence
+  intervals). The sector sub-groups were not sampled for hypothesis testing and
+  this comparison was not pre-registered, so only counts, percentages and rank
+  summaries are produced.
+
+# Data source and exact variables used
+
+* **File:** `../data/round 2 - delphi/Delphi round2 cleaned manual.csv`
+  (the *same* file used by the STV analysis in `3_delphi_voting.Rmd`, so
+  denominators match).
+* **Sector:** column `sector` (the multi-select professional-sector item) and
+  `sector_other` (free text for "Other").
+* **Rankings** (values are rank positions, `1` = most preferred; each *completed*
+  domain ballot is a full strict ranking of that domain's items):
+  * `design and exp_1` … `design and exp_13`
+  * `respsonse and gov_1` … `respsonse and gov_10` (spelling as in the raw export)
+  * `research and data_1` … `research and data_7`
+
+The `raw` Qualtrics export (`../data/round 2 - delphi/Delphi raw2.csv`) is used in
+one chunk only, to reconcile response counts.
+
+```{r}
+library(tidyverse)
+library(writexl)
+
+data_path <- "../data/round 2 - delphi/Delphi round2 cleaned manual.csv"
+raw_path  <- "../data/round 2 - delphi/Delphi raw2.csv"
+out_dir   <- "../data/outputs"
+```
+
+# Load
+
+```{r}
+cm <- read_csv(data_path, show_col_types = FALSE, name_repair = "minimal") |>
+  mutate(rid = row_number())
+
+# ranking columns (the comment columns have no "_<digit>" and are excluded by the regex)
+rank_cols <- grep("^(design and exp|respsonse and gov|research and data)_[0-9]+",
+                  names(cm), value = TRUE)
+
+# map each ranking column -> domain + human item label
+item_map <- tibble(col = rank_cols) |>
+  tidyr::extract(col, c("domain_raw", "num", "label"),
+          "^(design and exp|respsonse and gov|research and data)_([0-9]+)(.*)$",
+          remove = FALSE) |>
+  mutate(
+    domain = recode(domain_raw,
+                    "design and exp"    = "Design & experience",
+                    "respsonse and gov" = "Response & governance",
+                    "research and data" = "Research & data"),
+    label  = str_squish(label),
+    num    = as.integer(num)
+  )
+```
+
+# Sector coding
+
+The survey item text is: *"Which of the following best describes your primary
+professional sector? (Select the one that best reflects your role in this space)"*.
+Despite the "select the one" wording, the item was exported as a **multiple-select**
+field, so a respondent *can* have more than one sector.
+
+**Important parsing note:** the export concatenates the *full* option labels, and
+the Industry label itself contains commas
+(`"Industry professional (e.g., developer, designer, platform representative,
+in-house counsel)"`). Splitting on `,` (or the `;` used in `2_delphi_round2.Rmd`)
+therefore mangles sector. We instead detect each canonical option as a **substring**.
+
+```{r}
+opts <- c(
+  Academia        = "Academic researcher",
+  Industry        = "Industry professional",
+  `Civil society` = "Civil society or nonprofit representative",
+  `Policy/gov`    = "Policy or government advisor",
+  Funder          = "Research funder or philanthropic representative",
+  Other           = "Other (please specify)"
+)
+
+detect_sectors <- function(cell) {
+  if (is.na(cell) || cell == "") return(character(0))
+  names(opts)[vapply(opts, function(o) str_detect(cell, fixed(o)), logical(1))]
+}
+
+cm <- cm |>
+  mutate(
+    sector_set = lapply(sector, detect_sectors),
+    n_sectors  = lengths(sector_set),
+    # single-sector ("primary") coding: NA when 0 or >1 sectors selected
+    sector_primary = vapply(sector_set, function(x) if (length(x) == 1) x else NA_character_, character(1))
+  )
+
+# how many sectors selected
+cm |> count(n_sectors) |> knitr::kable(caption = "Number of sectors selected per respondent")
+```
+
+# Denominators & reconciliation (n = 59 vs 60 vs 53/52/51)
+
+```{r}
+# --- valid ballots per domain in the analysis file (should match STV: 53/52/51) ---
+dom_cols <- function(pfx) grep(paste0("^", pfx, "_[0-9]+"), names(cm), value = TRUE)
+is_valid <- function(cols) rowSums(!is.na(cm[cols]) & cm[cols] != "") > 0
+
+cm <- cm |>
+  mutate(
+    valid_design   = is_valid(dom_cols("design and exp")),
+    valid_response = is_valid(dom_cols("respsonse and gov")),
+    valid_research = is_valid(dom_cols("research and data")),
+    any_valid      = valid_design | valid_response | valid_research
+  )
+
+recon_cleaned <- tibble(
+  quantity = c("Records in analysis file",
+               "  with a sector recorded",
+               "  with >=1 valid domain ballot",
+               "  blank ballots (no rankings at all)",
+               "Valid ballots - Design & experience",
+               "Valid ballots - Response & governance",
+               "Valid ballots - Research & data"),
+  n = c(nrow(cm),
+        sum(cm$n_sectors > 0),
+        sum(cm$any_valid),
+        sum(!cm$any_valid),
+        sum(cm$valid_design),
+        sum(cm$valid_response),
+        sum(cm$valid_research))
+)
+knitr::kable(recon_cleaned, caption = "Analysis-file (cleaned) denominators")
+
+# --- raw Qualtrics export, to explain the n = 59 the manuscript reports ---
+raw2 <- read_csv(raw_path, show_col_types = FALSE, name_repair = "minimal") |>
+  slice(3:n())  # drop the 2 Qualtrics meta rows (question text + ImportId)
+
+recon_raw <- tibble(
+  quantity = c("Raw response rows (meta rows removed)",
+               "  with a sector recorded  ->  matches manuscript n",
+               "  Finished (Progress = 100)",
+               "  with >=1 ranking present"),
+  n = c(nrow(raw2),
+        sum(!is.na(raw2$sector) & raw2$sector != ""),
+        sum(raw2$Finished == "TRUE"),
+        sum(rowSums(!is.na(raw2[grep("^(design and exp|respsonse and gov|research and data)_[0-9]+$", names(raw2))]) &
+                      raw2[grep("^(design and exp|respsonse and gov|research and data)_[0-9]+$", names(raw2))] != "") > 0))
+)
+knitr::kable(recon_raw, caption = "Raw-export denominators")
+```
+
+**Reading of the discrepancy (not silently resolved):**
+
+* The **raw export has 61** usable response rows. Two have no sector, leaving **59
+  with a sector** — this is the most likely source of the manuscript's *n = 59*.
+* The **analysis (voting) file has 60** rows. It contains one *fewer* row than the
+  raw export; the missing row is an **Industry respondent who submitted no rankings**
+  (raw Industry = 16, analysis-file Industry = 15). Why that single blank record was
+  dropped during the manual cleaning is **not documented in code** and cannot be
+  verified here.
+* Only **53 / 52 / 51** rows carry a valid ballot in each domain; these are the STV
+  denominators. Seven of the 60 records are **blank ballots** (a sector, sometimes,
+  but no rankings).
+
+So *59*, *60* and *53/52/51* count **different things** (respondents-with-sector,
+spreadsheet rows, and valid ballots per domain) and are not in conflict once
+separated.
+
+# Long-format ranks
+
+```{r}
+long <- cm |>
+  select(rid, sector_set, all_of(rank_cols)) |>
+  pivot_longer(all_of(rank_cols), names_to = "col", values_to = "rank") |>
+  mutate(rank = suppressWarnings(as.numeric(rank))) |>
+  left_join(item_map |> select(col, domain, label), by = "col") |>
+  filter(!is.na(rank))
+
+# explode to one row per (respondent x sector) so multi-sector respondents count
+# in each sector they selected
+long_sec <- long |> unnest_longer(sector_set, values_to = "sector")
+
+# valid ballots per sector x domain (the correct denominators for %)
+valid_by <- long_sec |>
+  distinct(rid, sector, domain) |>
+  count(sector, domain, name = "n_valid")
+```
+
+# (3) Sector sample sizes
+
+```{r}
+# multi-select membership (a respondent contributes to every sector they picked)
+sector_membership <- tibble(sector = unlist(cm$sector_set)) |>
+  count(sector, name = "n_selecting", sort = TRUE)
+
+# mutually-exclusive "primary" (single-sector respondents only)
+sector_primary_counts <- cm |> count(sector_primary, name = "n_primary")
+
+# valid ballots available per sector, by domain
+valid_wide <- valid_by |> pivot_wider(names_from = domain, values_from = n_valid, values_fill = 0)
+
+sector_Ns <- sector_membership |>
+  left_join(cm |> filter(n_sectors == 1) |> count(sector_primary, name = "n_single"),
+            by = c("sector" = "sector_primary")) |>
+  left_join(valid_wide, by = "sector") |>
+  mutate(interpretable = if_else(n_selecting >= 10, "yes", "TOO SMALL - unstable"))
+
+knitr::kable(sector_Ns, caption = "Sector Ns (multi-select membership, single-sector count, and valid ballots by domain)")
+knitr::kable(sector_primary_counts, caption = "Mutually-exclusive primary sector (single-sector respondents; NA = 0 or >1 sectors)")
+```
+
+Only **Academia (~26–27)** and **Industry (~15)** have samples large enough for even
+descriptive comparison. **Policy/gov (6), Civil society (5), Other (5), Funder (1)**
+are too small — a single respondent moves their percentages by 15–100 points — and
+are reported for completeness only.
+
+# (4) Priority preferences by sector — descriptive
+
+```{r}
+# ---- first preference: item ranked 1 ----
+first_pref <- long_sec |>
+  filter(rank == 1) |>
+  count(sector, domain, label, name = "n_first") |>
+  left_join(valid_by, by = c("sector", "domain")) |>
+  mutate(pct_first = round(100 * n_first / n_valid, 1))
+
+# ---- top-5 inclusion: item ranked <= 5 ----
+top5 <- long_sec |>
+  filter(rank <= 5) |>
+  count(sector, domain, label, name = "n_top5") |>
+  left_join(valid_by, by = c("sector", "domain")) |>
+  mutate(pct_top5 = round(100 * n_top5 / n_valid, 1))
+
+# ---- rank distribution summary (mean/median rank among those who ranked it) ----
+rank_dist <- long_sec |>
+  group_by(sector, domain, label) |>
+  summarise(n_ranked = n(), mean_rank = round(mean(rank), 2),
+            median_rank = median(rank), .groups = "drop")
+
+# tidy full tables (all sectors kept; small-sector flag included)
+reliable <- function(s) if_else(s %in% c("Academia", "Industry"), "", " (small N - unstable)")
+
+first_pref_out <- first_pref |>
+  arrange(domain, sector, desc(pct_first)) |>
+  mutate(note = reliable(sector))
+top5_out <- top5 |>
+  arrange(domain, sector, desc(pct_top5)) |>
+  mutate(note = reliable(sector))
+```
+
+## Academia vs Industry — TOP-5 inclusion (%)
+
+```{r}
+ai_top5 <- top5 |>
+  filter(sector %in% c("Academia", "Industry")) |>
+  select(domain, label, sector, pct_top5) |>
+  pivot_wider(names_from = sector, values_from = pct_top5, values_fill = 0) |>
+  mutate(diff = round(Academia - Industry, 1)) |>
+  arrange(domain, desc(Academia))
+knitr::kable(ai_top5, caption = "Top-5 inclusion %: Academia (n~26) vs Industry (n~14). diff = Academia - Industry")
+```
+
+## Academia vs Industry — FIRST preference (%)
+
+```{r}
+ai_first <- first_pref |>
+  filter(sector %in% c("Academia", "Industry")) |>
+  select(domain, label, sector, n_first, pct_first) |>
+  pivot_wider(names_from = sector, values_from = c(n_first, pct_first), values_fill = 0) |>
+  arrange(domain, desc(pct_first_Academia))
+knitr::kable(ai_first, caption = "First-preference counts/% : Academia vs Industry")
+```
+
+# (5) Exploratory sector-specific STV (Academia & Industry only)
+
+Run **only** for Academia (~26 ballots) and Industry (~14 ballots), alongside the
+full sample for comparison. **This is an exploratory sensitivity check, not a
+result.** Industry in particular is small: with a Droop quota, 5 seats from ~14
+ballots means each "winner" is backed by only ~3 first-preferences, so its ordering
+is fragile. STV is **not** run for Policy/Civil society/Other/Funder (too small).
+
+```{r}
+library(vote)
+
+short_lab <- function(cols) str_squish(sub("^(design and exp|respsonse and gov|research and data)_[0-9]+", "", cols))
+in_sector <- function(s) vapply(cm$sector_set, function(x) s %in% x, logical(1))
+
+run_stv_safe <- function(dat) {
+  dat <- as.data.frame(lapply(dat, function(x) suppressWarnings(as.numeric(x))))
+  dat <- dat[rowSums(!is.na(dat)) > 0, , drop = FALSE]      # valid ballots only
+  suppressWarnings(stv(dat, nseats = 5, invalid.partial = TRUE, equal.ranking = FALSE,
+                       quota.hare = FALSE, verbose = FALSE, quiet = TRUE))
+}
+
+domains <- list(
+  `Design & experience`   = dom_cols("design and exp"),
+  `Response & governance` = dom_cols("respsonse and gov"),
+  `Research & data`       = dom_cols("research and data")
+)
+
+stv_compare <- map_dfr(names(domains), function(dn) {
+  cols <- domains[[dn]]
+  grp <- list(All = cm, Academia = cm[in_sector("Academia"), ], Industry = cm[in_sector("Industry"), ])
+  map_dfr(names(grp), function(g) {
+    d <- grp[[g]][cols]; colnames(d) <- cols
+    n_valid <- sum(rowSums(!is.na(sapply(d, as.numeric))) > 0)
+    res <- run_stv_safe(d)
+    tibble(domain = dn, group = g, n_ballots = n_valid,
+           elected_in_order = paste(short_lab(res$elected), collapse = " > "))
+  })
+})
+knitr::kable(stv_compare, caption = "Exploratory STV elected sets (order of election) by group")
+```
+
+# (7) Write outputs
+
+```{r}
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+
+# compact academia-vs-industry supplementary table (top-5 % + diff, per domain)
+academia_vs_industry <- ai_top5
+
+write_xlsx(list(sector_Ns = sector_Ns,
+                sector_primary = sector_primary_counts),
+           file.path(out_dir, "sector_Ns.xlsx"))
+write_xlsx(first_pref_out, file.path(out_dir, "sector_first_pref_by_priority.xlsx"))
+write_xlsx(top5_out,       file.path(out_dir, "sector_top5_by_priority.xlsx"))
+write_xlsx(list(top5_diff = academia_vs_industry,
+                first_pref = ai_first,
+                stv_compare = stv_compare),
+           file.path(out_dir, "academia_vs_industry_supp.xlsx"))
+
+# CSV mirrors
+write_csv(sector_Ns,      file.path(out_dir, "sector_Ns.csv"))
+write_csv(first_pref_out, file.path(out_dir, "sector_first_pref_by_priority.csv"))
+write_csv(top5_out,       file.path(out_dir, "sector_top5_by_priority.csv"))
+write_csv(rank_dist,      file.path(out_dir, "sector_rank_distribution.csv"))
+write_csv(academia_vs_industry, file.path(out_dir, "academia_vs_industry_top5.csv"))
+```
+
+# Session info
+
+```{r}
+sessionInfo()
+```

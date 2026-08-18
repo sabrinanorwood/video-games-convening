@@ -140,4 +140,105 @@ res_research_and_data$elected
 
 ```
 
+# Table 2 (Round 1 priorities and their Round 2 rankings)
+
+Table 2 lists **all** priorities identified in Round 1 with their Round 2 results. For
+the **five highest-ranked priorities in each domain** we report the **STV election
+order** and the **number of ballots on which the priority was ranked**.
+**First-preference counts** are given descriptively, to indicate initial support; they
+should **not** be read as determining the final STV order, which incorporates
+transferred preferences (see the round-by-round detail below). Priorities carried into
+the **World Café** are marked.
+
+Two things worth noting:
+
+* Round 2 used complete drag-and-drop rankings, so every priority was ranked on every
+  valid ballot in its domain — the "ballots ranked" column therefore equals the
+  domain's valid-ballot count (53 / 52 / 51) for all priorities.
+* The World Café discussed the **top two priorities per domain**, taken verbatim from
+  the facilitator scripts in `/materials`. In *Governance* and *Research* these are the
+  STV top two; in *Design* the World Café used *Harms & benefits* and *Long-term
+  effects* (STV #2 and #3) rather than *Dark patterns* (STV #1) — the mismatch is real
+  and is flagged here rather than hidden.
+
+```{r}
+
+# The wrangling above ran clean_names(), which drops the human-readable item labels.
+# Re-read with the original headers so Table 2 shows readable priority names.
+cm_labels <- read_csv("../data/round 2 - delphi/Delphi round2 cleaned manual.csv",
+                      show_col_types = FALSE, name_repair = "minimal")
+
+item_cols  <- function(pfx) grep(paste0("^", pfx, "_[0-9]+"), names(cm_labels), value = TRUE)
+disp_label <- function(cols)
+  str_squish(sub("^(design and exp|respsonse and gov|research and data)_[0-9]+", "", cols))
+
+# Priorities discussed at the World Café = the top two per domain, verbatim from the
+# facilitator scripts (materials/Facilitator script - GD&PE / R&G / R&D .docx).
+worldcafe_priorities <- c(
+  "Harms & benefits",                "Long-term effects",              # Game design
+  "Self-regulation & co-regulation", "Child safety & protection",      # Governance
+  "Industry-academic data sharing",  "Open data & transparency"        # Research
+)
+
+domain_defs <- tibble::tribble(
+  ~domain,                             ~prefix,
+  "Game design & player experience",   "design and exp",
+  "Responsibility & governance",       "respsonse and gov",
+  "Research & data",                   "research and data"
+)
+
+build_table2_domain <- function(domain, prefix) {
+  cols <- item_cols(prefix)
+  M    <- sapply(cm_labels[cols], function(x) suppressWarnings(as.numeric(x)))
+  d    <- as.data.frame(M[rowSums(!is.na(M)) > 0, , drop = FALSE])
+  colnames(d) <- cols                                   # keep original names for STV
+  res  <- stv(d, nseats = 5, invalid.partial = TRUE, equal.ranking = FALSE,
+              quota.hare = FALSE, verbose = FALSE, quiet = TRUE)
+  tibble(
+    domain         = domain,
+    priority       = disp_label(cols),
+    stv_order      = match(cols, res$elected),          # 1..5 for elected, NA otherwise
+    ballots_ranked = as.integer(colSums(!is.na(M))),    # ballots ranking the item
+    first_pref     = as.integer(colSums(M == 1, na.rm = TRUE)),  # descriptive only
+    world_cafe     = disp_label(cols) %in% worldcafe_priorities
+  )
+}
+
+table2 <- purrr::pmap_dfr(domain_defs, build_table2_domain) |>
+  group_by(domain) |>
+  # elected five first, in STV election order; remaining priorities by first-pref
+  arrange(ifelse(is.na(stv_order), 99L, stv_order), desc(first_pref), .by_group = TRUE) |>
+  ungroup()
+
+# manuscript-facing display version
+table2_display <- table2 |>
+  transmute(
+    Domain                   = domain,
+    Priority                 = priority,
+    `STV election order`     = ifelse(is.na(stv_order), "—", as.character(stv_order)),
+    `Ballots ranked (n)`     = ballots_ranked,
+    `First-preference count` = first_pref,
+    `World Cafe`             = ifelse(world_cafe, "●", "")
+  )
+
+knitr::kable(table2_display, caption = "Table 2. Round 1 priorities and Round 2 STV rankings.")
+
+write_xlsx(table2, "../data/outputs/table2_priorities.xlsx")
+write_csv(table2,  "../data/outputs/table2_priorities.csv")
+
+```
+
+## Round-by-round detail (elimination order + tallies)
+
+`summary()` prints the full count-by-count tally for each domain, including the order
+in which priorities were elected or eliminated.
+
+```{r}
+
+summary(res_design_and_exp)
+summary(res_respsonse_and_gov)
+summary(res_research_and_data)
+
+```
+
 
